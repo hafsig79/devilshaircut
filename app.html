@@ -38,9 +38,9 @@
   </div>
 
 <ul id="hairtypes">
-  <li type="elv.jpg">nr 1</li>
-  <li type="http://www.bluelagoon.is/front2013/gallery/img2.png">nr 2</li>
-  <li type="http://www.bluelagoon.is/front2013/gallery/img3.png">nr 3</li>
+  <li type="hair1">Hair1</li>
+  <li type="hair2">Hair2</li>
+  
 </ul>
  <div id="increase" scaleby="10" class="btn">+</div>
  <div id="decrease" scaleby="-10" class="btn">-</div>
@@ -70,11 +70,15 @@
   var wigHeight = 128;
   var wigWidth = 128;
 
-  var currentX;
-  var currentY;
+  var currentX = 0;
+  var currentY = 0;
   var currentType;;
 
   var hairTypeList;
+
+  var imagePath = "images/";
+  var hornPath = "images/horns/"
+  var hairExtension = ".png";
 
 function init() {
   btn.addEventListener("click",buttonClick,false);
@@ -169,7 +173,7 @@ function enableSelectHair() {
 
 function onHairTypeSelect(e) {
   var type = e.target.getAttribute('type');
-  self.img.src = type;
+  self.img.src = self.imagePath+type+self.hairExtension;
   self.currentType = type;
 }
 
@@ -177,13 +181,13 @@ function onHairSelected() {
   self.img = new Image();
 
   self.img.onload = function(){
-    console.log('img loaded')
+    
    canMouseX = 0;
    canMouseY = 0;
-   render(true);
+   render(false);
   
   };
-  self.img.src = "http://images.christmastimeclipart.com/images/2/1271716593176_1788/img_1271716593176_17881.jpg";
+  self.img.src = "hair1";
 
     addDragHandlers(true);
 
@@ -265,21 +269,27 @@ function scaleHair(e) {
 function onKazaam() {
 
 
- self.img.src = self.currentType.replace('.jpg','_horn.jpg');
+ self.img.src = self.hornPath + self.currentType + self.hairExtension;
 
-  var oImg = Canvas2Image.saveAsPNG(self.canvas,true);  // will prompt the user to save the image as PNG.  
-  if (!oImg) {
-      alert("Sorry, this browser is not capable of saving " + strType + " files!");
-      return false;
-    }
+  addDragHandlers(false)
+  render(false);
 
-    oImg.id = "canvasimage";
+  setTimeout(function() {
+     var oImg = Canvas2Image.saveAsPNG(self.canvas,true);  // will prompt the user to save the image as PNG.  
+    if (!oImg) {
+        alert("Sorry, this browser is not capable of saving " + strType + " files!");
+        return false;
+      }
 
-    oImg.style.border = self.canvas.style.border;
-    var container = document.getElementById('contain');
+      oImg.id = "canvasimage";
 
-   container.replaceChild(oImg, canvCont);
-    addDragHandlers(false)
+      oImg.style.border = self.canvas.style.border;
+      var container = document.getElementById('contain');
+
+     container.replaceChild(oImg, canvCont);
+    
+  },3000)
+ 
 }
 
 init();
