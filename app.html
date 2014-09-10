@@ -1,299 +1,83 @@
 <html>
 <head>
   <title></title>
-
-  <style type="text/css">
-  body {
-    font-family:'Helvetica','Arial',sans-serif;
-  }
-  #canvcont {
-    height:480px;
-    width:320px;
-    background-color:#dddddd;
-    overflow:hidden;
-  }
-  .btn {
-    background-color: blue;
-    padding:5px;
-    color:white;
-    max-width:120px;
-    cursor:pointer;
-    text-align: center;
-  }
-
-  .btn:hover {
-    background-color: red;
-
-  }
-  </style>
+<link href='http://fonts.googleapis.com/css?family=Unica+One' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
   <script src="js/base64.js"></script>
   <script src="js/canvas2image.js"></script>
 
 </head>
 <body>
-  <div id="btn" class="btn trigger">#<div></div></div>
-
+  
+<div class="wrapper">
   <div id="contain">
     <div id="canvcont"></div>
   </div>
 
-<ul id="hairtypes">
-  <li type="hair1">Hair1</li>
-  <li type="hair2">Hair2</li>
-  
+<!--div id="btn" class="btn trigger step1">Upload<div></div></div-->
+
+    <div id="btn" class="button_base b05_3d_roll trigger step1">
+        <div>Upload</div>
+        <div>Upload</div>
+    </div>
+
+<ul id="hairtypes" class="step2 cf">
+  <li type="hair1"><img src="images/hair1.png"></li>
+  <li type="hair2"><img src="images/hair2.png"></li>
+  <li type="hair3"><img src="images/hair3.png"></li>
 </ul>
- <div id="increase" scaleby="10" class="btn">+</div>
- <div id="decrease" scaleby="-10" class="btn">-</div>
- <div id="kazaam" class="btn">KAZAAM!</div>
+
+<div id="hairscale" class="step2 cf">
+  <p>Hair scale:</p>
+  <ul>
+    <li id="increase" scaleby="10" class="button_base b05_3d_roll">
+      <div>+</div>
+      <div>+</div>
+    </li>
+    <li id="decrease" scaleby="-10" class="button_base b05_3d_roll">
+      <div>-</div>
+      <div>-</div>
+    </li>
+  </ul>
+</div>
+ <div id="kazaam" class="button_base b05_3d_roll step2">
+    <div>Kazaam!</div>
+    <div>Kazaam!</div>
+ </div>
  <div id="result"></div> 
+ <div id="reset" class="button_base b05_3d_roll step3">
+    <div>Again</div>
+    <div>Again</div>
+ </div>
 
+</div>
+<!--iframe width="100%" height="100%" src="//www.youtube.com/embed/ccrFctUfty8?autoplay=1&loop=1&showinfo=0&controls=0" frameborder="0" allowfullscreen  volume="0"></iframe-->  
 
-  <script type="text/javascript">
+<iframe class="youtube-player" id="player" width="100%" height="100%" type="text/html" src="http://www.youtube.com/embed/ccrFctUfty8?wmode=opaque&autohide=0&autoplay=1&showinfo=0&controls=0&enablejsapi=1" frameborder="0" muted="muted"></iframe>
 
-
-  var context;
-  var canvasWidth = 320;
-  var canvasHeight = 480;
-  var canvas;
-  var img;
-  var scale;
-  var bgImage;
-  self = this;
-  var btn = document.getElementById('btn');
-  var increase = document.getElementById('increase');
-  var decrease = document.getElementById('decrease');
-  var kazaam = document.getElementById('kazaam');
-  var offsetX = 0;
-  var offsetY = 0;
-  var canvCont;
-
-  var wigHeight = 128;
-  var wigWidth = 128;
-
-  var currentX = 0;
-  var currentY = 0;
-  var currentType;;
-
-  var hairTypeList;
-
-  var imagePath = "images/";
-  var hornPath = "images/horns/"
-  var hairExtension = ".png";
-
-function init() {
-  btn.addEventListener("click",buttonClick,false);
-  increase.addEventListener("click",scaleHair,false);
-  decrease.addEventListener("click",scaleHair,false);
-  kazaam.addEventListener("click",onKazaam,false);
-
-   
-
-  self.hairTypeList = document.querySelector('#hairtypes').querySelectorAll('li');
-
-  for(var i=0;i<self.hairTypeList.length;i++) {
-    self.hairTypeList[i].addEventListener('mousedown',onHairTypeSelect);
-    
-  }
-}
-
-function buttonClick(event) {
-   event.preventDefault();
-
-   if(document.getElementById('canvcont')) {
-      self.canvCont = document.getElementById('canvcont');
-      self.canvCont.innerHTML = "";
-    }else {
-      var container = document.getElementById('contain');
-      container.innerHTML = '<div id="canvcont"></div>';
-      init();
-    }
-
-  //INPUT
-  //  create input element so the user can
-  //  navigate his/her filesystem/camera
-  var input = document.createElement("input");
-  input.type = "file";
-  input.setAttribute("accept","image/*");
-  //INPUT SELECT
-  //  once the user has selected a file
-  //  for upload, the onchange event will fire in which
-  //  case an blob url is created and the image is loaded
-
-  input.addEventListener("change",function(event){
-    var file = event.target.files[0];
-    var URL = window.URL || window.webkitURL;
-    var imgURL = URL.createObjectURL(file);
-    var img = new Image();
-
-      //IMAGE LOAD
-      //  once the image is loaded into memory it has
-      //  to be resized, a temporary canvas element is created
-      //  and a new image object is used to display the new
-      //  thumbnail.
-      img.addEventListener("load",function(event){
-
-        //CANVAS
-        //  create canvas element that is used as a container
-        //  to resize the image
-        self.bgImage = event.target;
-        self.scale = (event.target.height / event.target.width);
-        self.canvas = document.createElement("canvas");
-        self.canvas.width = 320;
-        self.canvas.height = 320 *self.scale// / 8;
-        self.canvasHeight = 320*self.scale;
-        self.context = self.canvas.getContext("2d");
-        self.canvCont.style.height = self.canvasHeight+"px"
-        // context.drawImage(event.target,0,0,event.target.width,event.target.height);
-
-
-        self.context.drawImage(self.bgImage,0,0,320,320*self.scale);
-        self.canvCont.appendChild(self.canvas);
-
-
-      },false);
-        //ORIGINAL IMAGE
-        //  first set src of the original image (so that the onload event
-        //  will fire) and the that free the object-url resource.
-  img.src = imgURL;
-  URL.revokeObjectURL(imgURL);
-
-  },false);
-
-  document.body.appendChild(input);
-  input.style.display = "none";
-  input.click();
-
-  enableSelectHair()
-
-}
-
-function enableSelectHair() {
-    onHairSelected();
-}
-
-function onHairTypeSelect(e) {
-  var type = e.target.getAttribute('type');
-  self.img.src = self.imagePath+type+self.hairExtension;
-  self.currentType = type;
-}
-
-function onHairSelected() {
-  self.img = new Image();
-
-  self.img.onload = function(){
-    
-   canMouseX = 0;
-   canMouseY = 0;
-   render(false);
-  
-  };
-  self.img.src = "hair1";
-
-    addDragHandlers(true);
-
-}
-
-function addDragHandlers(addHandlers) {
-  if(addHandlers) {
-    self.canvCont.addEventListener('mousedown',handleMouseDown,false);
-    self.canvCont.addEventListener('mouseup',handleMouseUp,false);
-    self.canvCont.addEventListener('mouseout',handleMouseOut,false);
-    self.canvCont.addEventListener('mousemove',handleMouseMove,false);
-  }else {
-    self.canvCont.removeEventListener('mousedown',handleMouseDown,false);
-    self.canvCont.removeEventListener('mouseup',handleMouseUp,false);
-    self.canvCont.removeEventListener('mouseout',handleMouseOut,false);
-    self.canvCont.removeEventListener('mousemove',handleMouseMove,false);
-  }
-}
-
-function handleMouseDown(e){
-  canMouseX=parseInt(e.clientX -offsetX);
-  canMouseY=parseInt(e.clientY -offsetY);
-      // set the drag flag
-      isDragging=true;
-}
-
-function handleMouseUp(e){
-  canMouseX=parseInt(e.clientX-offsetX);
-  canMouseY=parseInt(e.clientY-offsetY);
-  // clear the drag flag
-  isDragging=false;
-}
-
-function handleMouseOut(e){
-  canMouseX=parseInt(e.clientX-offsetX);
-  canMouseY=parseInt(e.clientY-offsetY);
-  // user has left the canvas, so clear the drag flag
-  //isDragging=false;
-}
-
-function handleMouseMove(e){
-  canMouseX=parseInt(e.clientX-offsetX);
-  canMouseY=parseInt(e.clientY-offsetY);
-  // if the drag flag is set, clear the canvas and draw the image
-  if(isDragging){
-   
-      render(true);
-  }
-}
-
-function render(isDragging) {
-
-   if(isDragging) {
-      //self.currentX = canMouseX-128/2;
-      //self.currentY = canMouseY-120/2;
-      self.currentX = canMouseX-self.wigWidth/2;
-      self.currentY = canMouseY-self.wigHeight/2;
-    }
-
-    context.clearRect(0,0,canvasWidth,canvasHeight);
-    self.context.drawImage(self.bgImage,0,0,320,320*self.scale);
-
-  
-      context.drawImage(img,self.currentX,self.currentY,self.wigWidth,self.wigHeight);
-   
-    
-}
-
-function scaleHair(e) {
-  var scaleFactor = parseInt(e.target.getAttribute('scaleby'),10)
-  console.log(scaleFactor)
-  self.wigWidth += scaleFactor;
-  self.wigHeight += scaleFactor;
-  console.log(self.wigWidth)
-  console.log(self.wigHeight)
-  render(false);
-}
-
-function onKazaam() {
-
-
- self.img.src = self.hornPath + self.currentType + self.hairExtension;
-
-  addDragHandlers(false)
-  render(false);
-
-  setTimeout(function() {
-     var oImg = Canvas2Image.saveAsPNG(self.canvas,true);  // will prompt the user to save the image as PNG.  
-    if (!oImg) {
-        alert("Sorry, this browser is not capable of saving " + strType + " files!");
-        return false;
-      }
-
-      oImg.id = "canvasimage";
-
-      oImg.style.border = self.canvas.style.border;
-      var container = document.getElementById('contain');
-
-     container.replaceChild(oImg, canvCont);
-    
-  },3000)
+<script type="text/javascript" src="js/app.js"></script>
+<script>      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+      tag.src = "http://www.youtube.com/player_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
  
-}
-
-init();
-
-    </script>
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      function onYouTubePlayerAPIReady() {
+        player = new YT.Player('player', {
+          playerVars: { 'autoplay': 1, 'controls': 0,'autohide':0,'wmode':'opaque','showinfo': 0,'loop':1 },
+          videoId: 'ccrFctUfty8',
+          events: {
+            'onReady': onPlayerReady}
+        });
+      }
+ 
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+        event.target.mute();
+      }
+</script>
   </body>
   </html>
