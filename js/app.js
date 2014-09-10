@@ -248,10 +248,11 @@ function scaleHair(e) {
 
 function onKazaam() {
 
+console.log(player)
 setStep(3);
 
-  var player = document.getElementById('player');
-  player.style.opacity = 1;
+  var player1 = document.getElementById('player');
+  player1.style.opacity = 1;
 
  self.img.src = self.hornPath + self.currentType + self.hairExtension;
 
