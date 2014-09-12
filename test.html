@@ -1,0 +1,32 @@
+<html>
+<head>
+  <title></title>
+<link href='http://fonts.googleapis.com/css?family=Unica+One' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+
+
+</head>
+<body>
+
+	<div id="previewPane"></div>
+	<input type="file" id="upload" onchange="showFiles()">  
+
+	<script>
+	function showFiles() {
+		var files=document.getElementById("upload").files;
+
+		for(var i=0;i<files.length;i++) {
+			var file=files[i];
+			var image=document.createElement("img");
+			document.getElementById("previewPane").appendChild(image);
+			var fileReader= new FileReader();
+
+			fileReader.onload = (function(img) { return function(e) { img.src = e.target.result; }; })(image);
+
+			fileReader.readAsDataURL(file);
+
+		}
+	}
+	</script>
+</body>
+</head>

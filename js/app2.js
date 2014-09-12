@@ -34,7 +34,7 @@
 
 
 function init() {
-  btn.addEventListener("click",buttonClick,false);
+  //btn.addEventListener("click",buttonClick,false);
   increase.addEventListener("click",scaleHair,false);
   decrease.addEventListener("click",scaleHair,false);
   kazaam.addEventListener("click",onKazaam,false);
@@ -50,7 +50,7 @@ function init() {
 }
 
 function buttonClick(event) {
-   event.preventDefault();
+   //event.preventDefault();
 
    if(document.getElementById('canvcont')) {
       self.canvCont = document.getElementById('canvcont');
@@ -61,30 +61,16 @@ function buttonClick(event) {
       init();
     }
 
-  //INPUT
-  //  create input element so the user can
-  //  navigate his/her filesystem/camera
-  var input = document.createElement("input");
-  input.type = "file";
-  input.setAttribute("accept","image/*");
-  //INPUT SELECT
-  //  once the user has selected a file
-  //  for upload, the onchange event will fire in which
-  //  case an blob url is created and the image is loaded
+    var files=document.getElementById("upload").files;
 
-  input.addEventListener("change",function(event){
-    var file = event.target.files[0];
-    var URL = window.URL || window.webkitURL;
-    console.log(file)
-    var imgURL = URL.createObjectURL(file);
     var img = new Image();
+    var fileReader= new FileReader();
+    fileReader.onload = (function(img) { return function(e) { img.src = e.target.result; }; })(img);
+    fileReader.readAsDataURL(files[0]);
 
-      //IMAGE LOAD
-      //  once the image is loaded into memory it has
-      //  to be resized, a temporary canvas element is created
-      //  and a new image object is used to display the new
-      //  thumbnail.
-      img.addEventListener("load",function(event){
+     
+    
+    img.addEventListener("load",function(event){
 
         //CANVAS
         //  create canvas element that is used as a container
@@ -103,21 +89,9 @@ function buttonClick(event) {
         self.context.drawImage(self.bgImage,0,0,320,320*self.scale);
         self.canvCont.appendChild(self.canvas);
         setStep(2)
+      },false)
 
-      },false);
-        //ORIGINAL IMAGE
-        //  first set src of the original image (so that the onload event
-        //  will fire) and the that free the object-url resource.
-  img.src = imgURL;
-  URL.revokeObjectURL(imgURL);
-
-  },false);
-
-  document.body.appendChild(input);
-  input.style.display = "none";
-  input.click();
-
-  enableSelectHair()
+    enableSelectHair()
 
 }
 
