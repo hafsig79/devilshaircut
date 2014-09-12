@@ -159,11 +159,12 @@ function handleMouseOut(e){
 }
 
 function handleMouseMove(e){
+    var bRect = self.canvas.getBoundingClientRect();
+    mouseX = (e.clientX - bRect.left)*(self.canvas.width/bRect.width);
+    mouseY = (e.clientY - bRect.top)*(self.canvas.height/bRect.height);
 
-  offsetY = document.querySelector('.wrapper').offsetTop - (320*self.scale) + (hairHeight/2)
-  offsetX =500;
-  canMouseX=parseInt(e.clientX-offsetX);
-  canMouseY=parseInt(e.clientY-offsetY);
+  canMouseX = mouseX;
+  canMouseY = mouseY;
   // if the drag flag is set, clear the canvas and draw the image
   if(isDragging){
    
